@@ -1,7 +1,8 @@
-FROM python:3.11-slim
-RUN apt-get update && apt-get install -y git --no-install-recommends && rm -rf /var/lib/apt/lists/*
+FROM node:20-slim
+RUN apt-get update && apt-get install -y python3 python3-pip python3-venv git --no-install-recommends && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
-RUN pip install --no-cache-dir git+https://github.com/HaroldLeo/google-flights-mcp.git
-RUN pip install --no-cache-dir "fastmcp>=2.0"
+RUN python3 -m venv /opt/venv
+RUN /opt/venv/bin/pip install --no-cache-dir git+https://github.com/HaroldLeo/google-flights-mcp.git
+RUN npm install -g supergateway
 EXPOSE 8101
-CMD ["python", "-c", "from mcp_server_google_flights.server import mcp; mcp.settings.port=8101; mcp.settings.host='0.0.0.0'; mcp.run(transport='sse')"]
+CMD ["supergateway", "--stdio", "/opt/venv/bin/mcp-server-google-flights", "--port", "8101"]
